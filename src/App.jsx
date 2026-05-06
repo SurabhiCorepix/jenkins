@@ -8,7 +8,7 @@ function App() {
     <>
       <div>
         <h1>Hello World</h1>
-        <p>This is a React JS project created with Vite ok.</p>
+        <p>This is a React JS project created with Vite.</p>
       </div>
     </>
   )
