@@ -14,45 +14,50 @@ pipeline {
             }
         }
 
-        stage('Copy Latest Code') {
+        stage('Copy Code to /opt/jenkins') {
             steps {
                 sh """
                 set -e
+
+                echo "Creating destination folder..."
                 mkdir -p $DEST_DIR
 
+                echo "Copying code..."
                 cp -r ${WORKSPACE}/* $DEST_DIR/
                 """
             }
         }
 
-        stage('Install Dependencies (npm install)') {
-            steps {
-                dir("$DEST_DIR") {
-                    sh """
-                    set -e
-                    echo "Installing dependencies..."
-                    npm install
-                    """
-                }
-            }
-        }
-
-        stage('Build Project (npm build)') {
-            steps {
-                dir("$DEST_DIR") {
-                    sh """
-                    set -e
-                    echo "Building project..."
-                    npm run build
-                    """
-                }
-            }
-        }
-
-        stage('Verify Files') {
+        stage('npm install in /opt/jenkins') {
             steps {
                 sh """
-                echo "Files copied successfully"
+                set -e
+
+                echo "Running npm install in /opt/jenkins"
+                cd $DEST_DIR
+
+                npm install
+                """
+            }
+        }
+
+        stage('npm build in /opt/jenkins') {
+            steps {
+                sh """
+                set -e
+
+                echo "Running npm build in /opt/jenkins"
+                cd $DEST_DIR
+
+                npm run build
+                """
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh """
+                echo "Build completed successfully"
                 ls -la $DEST_DIR
                 """
             }
@@ -62,7 +67,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ SUCCESS: Build completed"
+            echo "✅ SUCCESS: Full pipeline completed"
         }
 
         failure {
