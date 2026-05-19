@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <div>
-        <h1>Hello World</h1>
+        <h1>Hello World1</h1>
         <p>This is a React JS project created with Vite ok.</p>
       </div>
     </>
