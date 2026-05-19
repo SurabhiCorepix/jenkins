@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DEST_DIR = "/opt/jenkins/extra_folder"
+        DEST_DIR = "/opt/jenkins"
     }
 
     stages {
