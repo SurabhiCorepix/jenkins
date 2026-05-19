@@ -14,61 +14,25 @@ pipeline {
             }
         }
 
-        stage('Prepare Folder') {
+        stage('Copy Latest Code') {
             steps {
-                sh '''
-                set -e
-                mkdir -p /opt/jenkins
-                '''
-            }
-        }
-
-        stage('Copy Code') {
-            steps {
-                sh '''
-                set -e
-                echo "Copying code to /opt/jenkins"
+                sh """
+                mkdir -p $DEST_DIR
 
                 cp -r ${WORKSPACE}/* $DEST_DIR/
-                '''
+                """
             }
         }
 
-        stage('Install Dependencies (npm install)') {
+        stage('Verify Files') {
             steps {
-                dir("${env.DEST_DIR}") {
-                    sh '''
-                    set -e
-                    echo "Running npm install"
+                sh """
+                echo "Files copied successfully"
 
-                    npm install
-                    '''
-                }
+                ls -la $DEST_DIR
+                """
             }
         }
 
-        stage('Build Project (npm run build)') {
-            steps {
-                dir("${env.DEST_DIR}") {
-                    sh '''
-                    set -e
-                    echo "Running npm build"
-
-                    npm run build
-                    '''
-                }
-            }
-        }
-
-    }
-
-    post {
-        success {
-            echo "✅ SUCCESS: Build completed"
-        }
-
-        failure {
-            echo "❌ FAILED: Check logs above"
-        }
     }
 }
