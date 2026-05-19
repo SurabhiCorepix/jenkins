@@ -7,43 +7,55 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Git Pull') {
             steps {
                 git branch: 'main',
                 url: 'https://github.com/SurabhiCorepix/jenkins.git'
             }
         }
 
-        stage('Copy Code') {
+        stage('Prepare Folder') {
             steps {
-                sh """
+                sh '''
                 set -e
-                mkdir -p $DEST_DIR
-                cp -r ${WORKSPACE}/* $DEST_DIR/
-                """
+                mkdir -p /opt/jenkins
+                '''
             }
         }
 
-        stage('Install Dependencies (npm i)') {
+        stage('Copy Code') {
             steps {
-                dir("$DEST_DIR") {
-                    sh """
+                sh '''
+                set -e
+                echo "Copying code to /opt/jenkins"
+
+                cp -r ${WORKSPACE}/* $DEST_DIR/
+                '''
+            }
+        }
+
+        stage('Install Dependencies (npm install)') {
+            steps {
+                dir("${env.DEST_DIR}") {
+                    sh '''
                     set -e
-                    echo "Installing dependencies..."
+                    echo "Running npm install"
+
                     npm install
-                    """
+                    '''
                 }
             }
         }
 
-        stage('Build Project (npm build)') {
+        stage('Build Project (npm run build)') {
             steps {
-                dir("$DEST_DIR") {
-                    sh """
+                dir("${env.DEST_DIR}") {
+                    sh '''
                     set -e
-                    echo "Building project..."
+                    echo "Running npm build"
+
                     npm run build
-                    """
+                    '''
                 }
             }
         }
@@ -52,11 +64,11 @@ pipeline {
 
     post {
         success {
-            echo "✅ Pipeline SUCCESS: Build completed"
+            echo "✅ SUCCESS: Build completed"
         }
 
         failure {
-            echo "❌ Pipeline FAILED: Check logs above"
+            echo "❌ FAILED: Check logs above"
         }
     }
 }
