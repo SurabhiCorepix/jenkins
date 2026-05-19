@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DEST_DIR = "/var/www/extra_folder"
+        DEST_DIR = "C:\Users\Lenovo\Documents\CorepixGit\jenkins\extra_folder"
     }
 
     stages {
