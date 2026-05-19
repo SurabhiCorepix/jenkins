@@ -2,38 +2,34 @@ pipeline {
     agent any
 
     environment {
-        DEST_DIR = "C:\\Users\\Lenovo\\Documents\\CorepixGit\\jenkins\\extra_folder"
+        DEST_DIR = "/var/www/extra_folder"
     }
 
     stages {
 
-        stage('Checkout Code (Git Pull)') {
+        stage('Git Pull') {
             steps {
                 git branch: 'main',
                 url: 'https://github.com/SurabhiCorepix/jenkins.git'
             }
         }
 
-        stage('Test') {
+        stage('Copy Latest Code') {
             steps {
-                echo 'Jenkins working'
-            }
-        }
+                sh """
+                mkdir -p $DEST_DIR
 
-        stage('Copy to Extra Folder') {
-            steps {
-                bat """
-                if not exist "%DEST_DIR%" mkdir "%DEST_DIR%"
-
-                robocopy "%WORKSPACE%" "%DEST_DIR%" /E /R:2 /W:2
+                cp -r ${WORKSPACE}/* $DEST_DIR/
                 """
             }
         }
 
-        stage('Verify Copy') {
+        stage('Verify Files') {
             steps {
-                bat """
-                dir "%DEST_DIR%"
+                sh """
+                echo "Files copied successfully"
+
+                ls -la $DEST_DIR
                 """
             }
         }
