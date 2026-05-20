@@ -42,7 +42,7 @@ pipeline {
             }
         }
 
- stage('Copy Project to App Folder') {
+stage('Copy Project to App Folder') {
     steps {
         sh '''
         set -ex
@@ -51,6 +51,7 @@ pipeline {
 
         rsync -av \
         --exclude='.git' \
+        --exclude='.env' \
         --exclude='Jenkinsfile' \
         $CLONE_DIR/ $APP_DIR/
 
