@@ -2,48 +2,56 @@ pipeline {
     agent any
 
     environment {
-        DEST_DIR = "/opt/jenkins"
+        REPO_NAME = "jenkins"
+
+        GIT_URL = "https://github.com/SurabhiCorepix/jenkins.git"
+
+        CLONE_DIR = "/opt/jenkins/${REPO_NAME}"
+
+        APP_DIR = "/opt/cp_apps/${REPO_NAME}"
     }
 
     stages {
 
-        stage('Git Pull') {
-            steps {
-                git branch: 'main',
-                url: 'https://github.com/SurabhiCorepix/jenkins.git'
-            }
-        }
-
-        stage('Check Node & NPM') {
+        stage('Prepare Folders') {
             steps {
                 sh '''
-                echo "Checking Node..."
-                node -v
-
-                echo "Checking NPM..."
-                npm -v
+                mkdir -p /opt/jenkins
+                mkdir -p /opt/cp_apps
                 '''
             }
         }
 
-        stage('Clean Old Files') {
-            steps {
-                sh '''
-                rm -rf /opt/jenkins/*
-                '''
-            }
-        }
-
-        stage('Copy Code') {
+        stage('Clone or Pull Repository') {
             steps {
                 sh '''
                 set -ex
 
-                mkdir -p /opt/jenkins
+                if [ -d "$CLONE_DIR/.git" ]; then
+                    echo "Repository already exists. Pulling latest code..."
 
-                cp -r ${WORKSPACE}/* /opt/jenkins/
+                    cd $CLONE_DIR
+                    git pull origin main
 
-                echo "Files copied successfully"
+                else
+                    echo "Cloning fresh repository..."
+
+                    git clone $GIT_URL $CLONE_DIR
+                fi
+                '''
+            }
+        }
+
+        stage('Copy Project to App Folder') {
+            steps {
+                sh '''
+                set -ex
+
+                rm -rf $APP_DIR
+
+                cp -r $CLONE_DIR $APP_DIR
+
+                echo "Project copied successfully"
                 '''
             }
         }
@@ -51,7 +59,16 @@ pipeline {
         stage('Verify Files') {
             steps {
                 sh '''
-                ls -la /opt/jenkins
+                ls -la $APP_DIR
+                '''
+            }
+        }
+
+        stage('Check Node & NPM') {
+            steps {
+                sh '''
+                node -v
+                npm -v
                 '''
             }
         }
@@ -61,7 +78,7 @@ pipeline {
                 sh '''
                 set -ex
 
-                cd /opt/jenkins
+                cd $APP_DIR
 
                 npm install
                 '''
@@ -73,7 +90,7 @@ pipeline {
                 sh '''
                 set -ex
 
-                cd /opt/jenkins
+                cd $APP_DIR
 
                 npm run build
                 '''
