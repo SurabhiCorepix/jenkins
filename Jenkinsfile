@@ -47,11 +47,11 @@ pipeline {
                 sh '''
                 set -ex
 
-                rm -rf $APP_DIR
+                mkdir -p $APP_DIR
 
-                cp -r $CLONE_DIR $APP_DIR
+                rsync -av $CLONE_DIR/ $APP_DIR/
 
-                echo "Project copied successfully"
+                echo "Project synced successfully"
                 '''
             }
         }
