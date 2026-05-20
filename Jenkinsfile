@@ -42,19 +42,22 @@ pipeline {
             }
         }
 
-        stage('Copy Project to App Folder') {
-            steps {
-                sh '''
-                set -ex
+ stage('Copy Project to App Folder') {
+    steps {
+        sh '''
+        set -ex
 
-                mkdir -p $APP_DIR
+        mkdir -p $APP_DIR
 
-                rsync -av $CLONE_DIR/ $APP_DIR/
+        rsync -av \
+        --exclude='.git' \
+        --exclude='Jenkinsfile' \
+        $CLONE_DIR/ $APP_DIR/
 
-                echo "Project synced successfully"
-                '''
-            }
-        }
+        echo "Project synced successfully"
+        '''
+    }
+}
 
         stage('Verify Files') {
             steps {
