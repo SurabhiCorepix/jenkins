@@ -49,7 +49,7 @@ stage('Copy Project to App Folder') {
 
         mkdir -p $APP_DIR
 
-        rsync -av \
+        rsync -av --delete \
         --exclude='.git' \
         --exclude='.env' \
         --exclude='Jenkinsfile' \
